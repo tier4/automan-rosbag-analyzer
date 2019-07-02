@@ -7,7 +7,7 @@ MAX_RETRY_COUNT = 3
 class AutomanClient():
 
     @staticmethod
-    def send_analyzer_result(automan_info, dataset_candidates):
+    def send_analyzer_result(automan_info, dataset_candidates, status):
         host = automan_info['host']
         path = automan_info['path']
         automan_url = host + path
@@ -15,7 +15,7 @@ class AutomanClient():
         print(automan_url)
         data = {
             'dataset_candidates': dataset_candidates,
-            'status': 'analyzed'
+            'status': status
         }
         headers = {
             'Authorization': 'JWT ' + automan_info['jwt'],
