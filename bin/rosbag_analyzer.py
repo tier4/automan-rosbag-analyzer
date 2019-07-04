@@ -17,8 +17,8 @@ MSG_DATA_TYPE_MAP = {
 
 class RosbagAnalyzer(object):
 
-    @staticmethod
-    def analyze(file_path):
+    @classmethod
+    def analyze(cls, file_path, label_type):
         try:
             bag = Bag(file_path)
             dataset_candidates = []
@@ -33,11 +33,26 @@ class RosbagAnalyzer(object):
                         "frame_count": info.message_count
                     }
                     dataset_candidates.append(candidate)
-
-            return dataset_candidates
+            if cls.__is_label_type_valid(dataset_candidates, label_type):
+                return dataset_candidates, 'analyzed'
+            return [], 'invalid'
         except Exception as e:
             # FIXME
             raise(e)
+
+    @classmethod
+    def __is_label_type_valid(cls, candidates, label_type):
+        if label_type == 'BB2D':
+            return cls.__has_type(candidates, 'IMAGE')
+        elif label_type == 'BB2D3D':
+            return cls.__has_type(candidates, 'IMAGE') & cls.__has_type(candidates, 'PCD')
+
+    @staticmethod
+    def __has_type(candidates, _type):
+        for candidate in candidates:
+            if candidate['data_type'] == _type:
+                return True
+        return False
 
 
 if __name__ == '__main__':
@@ -53,5 +68,6 @@ if __name__ == '__main__':
     )
     storage_client.download()
     path = storage_client.get_local_path()
-    results = RosbagAnalyzer.analyze(path)
-    AutomanClient.send_analyzer_result(json.loads(args.automan_info), results)
+    label_type = json.loads(args.automan_info)['label_type']
+    results, status = RosbagAnalyzer.analyze(path, label_type)
+    AutomanClient.send_analyzer_result(json.loads(args.automan_info), results, status)
