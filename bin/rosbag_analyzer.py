@@ -14,13 +14,6 @@ MSG_DATA_TYPE_MAP = {
     'sensor_msgs/PointCloud2': 'PCD'
 }
 
-IMAGE = 1
-PCD = 2
-ANNOTATION_DATA_TYPE_MAP = {
-    'BB2D': IMAGE,
-    'BB2D3D': IMAGE | PCD
-}
-
 
 class RosbagAnalyzer(object):
 
@@ -47,17 +40,18 @@ class RosbagAnalyzer(object):
             # FIXME
             raise(e)
 
+    @classmethod
+    def __is_label_type_valid(cls, candidates, label_type):
+        if label_type == 'BB2D':
+            return cls.__has_type(candidates, 'IMAGE')
+        elif label_type == 'BB2D3D':
+            return cls.__has_type(candidates, 'IMAGE') & cls.__has_type(candidates, 'PCD')
+
     @staticmethod
-    def __is_label_type_valid(dataset_candidates, label_type):
-        require_object = ANNOTATION_DATA_TYPE_MAP[label_type]
-        rosbag_object = 0
-        for candidate in dataset_candidates:
-            if candidate['data_type'] == 'IMAGE':
-                rosbag_object = rosbag_object | IMAGE
-            elif candidate['data_type'] == 'PCD':
-                rosbag_object = rosbag_object | PCD
-        if require_object & rosbag_object == require_object:
-            return True
+    def __has_type(candidates, _type):
+        for candidate in candidates:
+            if candidate['data_type'] == _type:
+                return True
         return False
 
 
