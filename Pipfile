@@ -6,8 +6,6 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-azure = "==4.0.0"
-pyyaml = "*"
 rospkg = "*"
 requests = "*"
 
