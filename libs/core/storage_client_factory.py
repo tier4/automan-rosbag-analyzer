@@ -1,5 +1,6 @@
 from core.storages.azure_storage_client import AzureStorageClient
 from core.storages.local_storage_client import LocalStorageClient
+from core.storages.s3_storage_client import S3StorageClient
 
 
 class UnknownStorageError(Exception):
@@ -14,4 +15,6 @@ class StorageClientFactory(object):
             return AzureStorageClient(storage_config)
         elif storage_type == 'LOCAL_NFS':
             return LocalStorageClient(storage_config)
+        elif storage_type == 'AWS_S3':
+            return S3StorageClient(storage_config)
         raise UnknownStorageError
