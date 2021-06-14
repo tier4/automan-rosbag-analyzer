@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo ". /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-RUN cd /tmp && wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
+RUN cd /tmp && wget https://bootstrap.pypa.io/3.5/get-pip.py && python get-pip.py
 RUN pip install pipenv
 
 COPY Pipfile* /app/
