@@ -1,23 +1,29 @@
-from ubuntu:16.04
+ARG ros_distro=melodic
 
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-RUN apt-get update && \
-    apt-get install -y --allow-unauthenticated \
-    wget \
-    ros-kinetic-ros-base && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+FROM ros:${ros_distro}
 
-RUN echo ". /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-RUN cd /tmp && wget https://bootstrap.pypa.io/3.5/get-pip.py && python get-pip.py
-RUN pip install pipenv
+ARG ros_distro
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+RUN apt-get update \
+    && apt-get install -y wget gnupg lsb-release \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py \
+    && python3 /tmp/get-pip.py \
+    && pip install pipenv
 
 COPY Pipfile* /app/
 WORKDIR /app
-RUN pipenv install
+RUN pipenv sync
 
 COPY . /app
+
+ENV DISTRO=$ros_distro
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/app/bin/docker-entrypoint.bash"]
-CMD ["pipenv run python libs/rosbag_analyzer.py --help"]
+CMD ["pipenv run python bin/rosbag_analyzer.py --help"]
