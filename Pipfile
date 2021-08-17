@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 rospkg = "*"
 requests = "*"
+pycryptodomex = "*"
+gnupg = "*"
 
 [requires]
 python_version = "2.7"
